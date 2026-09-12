@@ -1,0 +1,15 @@
+{
+  "sources": {
+    "openai": [
+      {"id": "sample-1", "title": "A small retrieval update", "link": "https://example.com/sample-1", "description": "A self-authored sample article about retrieval evaluation."},
+      {"id": "sample-2", "title": "An item without a body", "link": "https://example.com/sample-2", "description": ""}
+    ],
+    "hn": [
+      {"id": "sample-1-copy", "title": "A small retrieval update", "link": "https://example.com/sample-1?utm_source=feed", "description": ""}
+    ]
+  },
+  "briefs": {
+    "openai:sample-1": {"id": "openai:sample-1", "title_ja": "小さな検索改善", "summary_ja": "検索評価を自作データで確認するサンプルです。"},
+    "openai:sample-2": {"id": "openai:sample-2", "title_ja": "本文のない項目", "summary_ja": ""}
+  }
+}

@@ -42,6 +42,11 @@
     "sort": "hot",
     "max_results": 10
   },
+  "notification": {
+    "max_items": 5,
+    "max_per_source": 2,
+    "source_priority": {"openai": 10, "anthropic": 10, "github_trending": 7, "arxiv": 6, "hn": 5, "reddit": 4}
+  },
   "summarize": {
     "enabled": true,
     "provider": "gemini",

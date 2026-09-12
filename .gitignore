@@ -1,3 +1,11 @@
 __pycache__/
 *.pyc
 output/
+delivery_state.json
+delivery_state.json.tmp
+seen.json.tmp
+.delivery.lock
+.pytest_cache/
+pytest-cache-files-*/
+pytest-*-tmp*/
+temp-test-news/

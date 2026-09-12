@@ -19,6 +19,7 @@ flowchart TD
 | ファイル | 役割 |
 |---|---|
 | `main.py` | 収集・差分抽出・要約・通知・既読状態の保存 |
+| `bot/delivery.py` | 重複排除、通知件数制限、日本語品質確認、送信後の状態確定 |
 | `config.json` | 情報源・検索条件・要約設定 |
 | `bot/github_trending.py` | GitHub Trendingの取得 |
 | `bot/reddit.py` | RedditのRSS取得 |
@@ -64,6 +65,12 @@ python -m venv .venv
 # 実行すると外部通信が発生します。Webhook設定済みなら実際に通知します。
 .\.venv\Scripts\python.exe main.py
 
+# 取得結果を表示するだけ。要約API・Discord通知・状態ファイル更新は行いません。
+.\.venv\Scripts\python.exe main.py --dry-run
+
+# 外部通信なしの自作サンプル。実ニュースや実APIの結果は含みません。
+.\.venv\Scripts\python.exe main.py --demo
+
 # 週次下書き。output/にファイルを生成します。
 .\.venv\Scripts\python.exe -m bot.generate_note_draft
 ```
@@ -76,6 +83,12 @@ python -m venv .venv
 ```
 
 単体テストの対象は下書き生成・Trending・Redditの各モジュールです。全情報源の現行仕様やDiscordへの実配信を保証するものではありません。
+
+通知は `config.json` の `notification.max_items`（全体上限）と
+`notification.max_per_source`（情報源ごとの上限）で絞ります。同じ正規化URLは
+情報源をまたいで一件にまとめ、要約のタイトル翻訳または本文要約が日本語にならない項目は
+送信せず保留します。送信成功を確認した後にだけ `seen.json` と `delivery_state.json` を更新するため、
+取得失敗・要約失敗・配信失敗の項目は次回に再試行できます。
 
 ## 公開版と個人運用
 
