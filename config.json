@@ -1,0 +1,53 @@
+{
+  "arxiv": {
+    "categories": ["cs.AI", "cs.CL"],
+    "keywords": ["distillation", "LoRA", "retrieval augmented", "LLM agent", "Claude", "GPT", "prompt engineering"],
+    "max_results": 10
+  },
+  "hn": {
+    "min_points": 300
+  },
+  "techcrunch": {
+    "feed_url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "max_results": 10
+  },
+  "producthunt": {
+    "feed_url": "https://www.producthunt.com/feed",
+    "max_results": 10
+  },
+  "lobsters": {
+    "feed_url": "https://lobste.rs/t/ai,ml.rss",
+    "max_results": 10
+  },
+  "anthropic": {
+    "feed_url": "https://tim-hilde.github.io/anthropic-rss/rss.xml",
+    "max_results": 10
+  },
+  "openai": {
+    "feed_url": "https://openai.com/news/rss.xml",
+    "max_results": 10
+  },
+  "github_trending": {
+    "languages": ["", "python"],
+    "since": "daily",
+    "max_results": 20
+  },
+  "reddit": {
+    "subreddits": ["MachineLearning", "LocalLLaMA", "artificial", "ClaudeAI", "OpenAI"],
+    "sort": "hot",
+    "max_results": 10
+  },
+  "reddit_sidehustle": {
+    "subreddits": ["SideProject", "Entrepreneur"],
+    "sort": "hot",
+    "max_results": 10
+  },
+  "summarize": {
+    "enabled": true,
+    "provider": "gemini",
+    "model": "gemini-flash-lite-latest",
+    "lang": "ja",
+    "style": "3行・専門用語は英語のまま残す",
+    "translate_hn_titles": true
+  }
+}
