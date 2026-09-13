@@ -66,6 +66,10 @@ def collect_pending(sources: dict, seen: dict, state: dict) -> tuple[list, int]:
                 record['members'].append(member)
             if not record['text']:
                 record['text'] = (entry.get('abstract') or entry.get('description') or '')[:2400]
+                if record['text'] and record.get('status') == 'title_only':
+                    # A retry may obtain the body after a title-only preview.
+                    # The cached empty summary must not count as ready anymore.
+                    record['status'] = 'summary_pending'
     return list(pending.values()), rejected
 
 

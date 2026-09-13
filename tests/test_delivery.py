@@ -65,3 +65,53 @@ def test_successful_delivery_acknowledges_only_after_send():
     assert seen['openai'] == ['one']
     assert state['pending'] == {}
     assert len(checkpoints) == 2
+
+
+def brief_for(rows):
+    return {r['id']: {'title_ja': '日本語見出し', 'summary_ja': '本文に基づく要約です。'}
+            for r in rows}
+
+
+def test_dry_run_never_sends_saves_or_mutates_inputs():
+    seen, state = {}, {}
+    def forbidden(*args):
+        raise AssertionError('dry-run must not send or persist')
+    result = deliver_digest({'openai': [record('one')]}, seen, state, {},
+                            brief_for, forbidden, forbidden, dry_run=True)
+    assert result['ready'] == 1 and result['sent'] == 0 and result['preview']
+    assert seen == {} and state == {}
+
+
+def test_retry_can_deliver_pending_item_missing_from_next_feed():
+    seen, state = {}, {}
+    deliver_digest({'openai': [record('one')]}, seen, state, {},
+                   brief_for, lambda _: False, lambda *args: None)
+    result = deliver_digest({}, seen, state, {},
+                            lambda _: {}, lambda _: True, lambda *args: None)
+    assert result['sent'] == 1
+    assert seen == {'openai': ['one']} and not state['pending']
+
+
+def test_title_only_retry_requires_summary_when_body_becomes_available():
+    seen, state = {}, {}
+    deliver_digest({'openai': [record('one', text='')]}, seen, state, {},
+                   brief_for, lambda _: False, lambda *args: None)
+    result = deliver_digest({'openai': [record('one', text='New body')]}, seen, state, {},
+                            lambda _: {}, lambda _: True, lambda *args: None)
+    assert result['quality_pending'] == 1 and result['sent'] == 0 and not seen
+    assert state['pending']['https://example.com/one']['status'] == 'translation_pending'
+
+
+def test_partial_delivery_marks_only_confirmed_batch_seen():
+    # Each long source URL forces a separate Discord batch.
+    rows = [record(str(i)) | {'link': 'https://example.com/' + str(i) + 'a' * 950}
+            for i in range(3)]
+    seen, state, snapshots = {}, {}, []
+    outcomes = iter([True, False])
+    result = deliver_digest({'openai': rows}, seen, state,
+                            {'max_items': 3, 'max_per_source': 3}, brief_for,
+                            lambda _: next(outcomes),
+                            lambda s, st: snapshots.append((copy.deepcopy(s), copy.deepcopy(st))))
+    assert result['sent'] == 1 and result['errors'] == ['DeliveryNotConfirmed']
+    assert seen == {'openai': ['0']} and len(state['pending']) == 2
+    assert snapshots[-1][0] == {'openai': ['0']}
