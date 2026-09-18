@@ -60,8 +60,8 @@ class TestGenerateMarkdown(unittest.TestCase):
         md = generate_markdown(items, "2024-01-15週")
 
         self.assertIn("# 週刊テックニュースまとめ（2024-01-15週）", md)
-        self.assertIn("## 今週のトピック一覧", md)
-        self.assertIn("今週の収集数: **3件**", md)
+        self.assertIn("## 保存済みトピック一覧", md)
+        self.assertIn("保存済み件数: **3件**", md)
         self.assertIn("- ArXiv: 2件", md)
         self.assertIn("- GitHub Trending: 1件", md)
         self.assertIn("## 注目ポイント", md)
@@ -101,6 +101,12 @@ class TestIdToLink(unittest.TestCase):
 
 
 class TestGenerateNoteDraft(unittest.TestCase):
+    def test_first_run_without_delivery_history(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = generate_note_draft(os.path.join(tmpdir, "missing.json"), tmpdir)
+            with open(path, encoding="utf-8") as handle:
+                self.assertIn("保存済み件数: **0件**", handle.read())
+
     def test_file_creation(self):
         """ファイルが正しく生成される"""
         with tempfile.TemporaryDirectory() as tmpdir:

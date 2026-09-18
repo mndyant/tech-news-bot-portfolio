@@ -1,7 +1,7 @@
 """週次note下書きMarkdownを生成する
 
-直近7日分のseen.jsonログ（ArXiv/HN/GitHub Trending等）を集計し、
-note記事テンプレートの下書きを生成する。
+seen.jsonの累積IDを集計し、note記事テンプレートの下書きを生成する。
+IDには取得日時がないため、直近7日への絞り込みは行わない。
 """
 
 import json
@@ -18,6 +18,8 @@ OUTPUT_DIR = "output"
 
 def load_seen_data(path: str = SEEN_PATH) -> dict:
     """seen.jsonを読み込む"""
+    if not os.path.exists(path):
+        return {}
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
@@ -56,11 +58,12 @@ def generate_markdown(items: Dict[str, List[str]], week_label: str) -> str:
     lines = []
     lines.append(f"# 週刊テックニュースまとめ（{week_label}）")
     lines.append("")
-    lines.append("## 今週のトピック一覧")
+    lines.append("## 保存済みトピック一覧")
+    lines.append("取得日時がないため、以下は直近7日ではなく保存済みIDの累積です。")
     lines.append("")
 
     total = sum(len(v) for v in items.values())
-    lines.append(f"今週の収集数: **{total}件**")
+    lines.append(f"保存済み件数: **{total}件**")
     lines.append("")
 
     for source, ids in items.items():

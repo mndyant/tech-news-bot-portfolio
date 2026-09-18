@@ -11,5 +11,5 @@ AI関連ニュースの取得・要約・Discord通知と週次Markdown下書き
 - テストは python -m pytest tests/ -v。生成済み下書きや画像は機械検査だけで公開可としない。
 - READMEは実装・config.json・workflowを照合し、ソース数や環境変数名を推測しない。
 - Indie Hackersは現在のconfig.jsonにない。コードがあるだけで有効な情報源として説明しない。
-- weekly_note.ymlのgit add -f output/は、出力がgitignore対象であることに対応した処理。意図を確認せず変更しない。
+- weekly_note.ymlは下書きを確認用artifactとして保存する。生成物の自動コミット・pushを行わない。
 - 既存リポジトリを更新する場合は、未コミット変更を確認してからfetchし、履歴を無断でrebaseしない。

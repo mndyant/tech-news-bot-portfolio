@@ -9,3 +9,19 @@ seen.json.tmp
 pytest-cache-files-*/
 pytest-*-tmp*/
 temp-test-news/
+
+# Secrets, local runtimes and delivery history
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+node_modules/
+.wrangler/
+.vscode/
+.idea/
+*.log
+*.pem
+*.key
+credentials*.json
+seen.json

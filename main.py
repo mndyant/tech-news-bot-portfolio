@@ -427,7 +427,8 @@ def main():
         print("自作の架空ニュース・手書き要約によるプレビュー（実APIの生成結果ではありません）")
     else:
         state = load_json("delivery_state.json") if Path("delivery_state.json").exists() else {}
-        seen = state.get("seen", load_json(SEEN_PATH))
+        seen = state["seen"] if "seen" in state else (
+            load_json(SEEN_PATH) if Path(SEEN_PATH).exists() else {})
         report = run_once(config, seen, state, dry_run=args.dry_run)
     for text in report.pop("preview"):
         print(text)

@@ -86,7 +86,9 @@ def select_items(records: list, config: dict) -> list:
         # this selector independently testable and safe for future collectors.
         return record.get('members') or [(record.get('source', ''), record.get('id', ''))]
 
-    for record in sorted(records, key=lambda r: -max(priority.get(s, 3) for s, _ in members(r))):
+    # Within the same priority, failed summaries must not monopolize the cap.
+    for record in sorted(records, key=lambda r: (
+            -max(priority.get(s, 3) for s, _ in members(r)), r.get('summary_failures', 0))):
         sources = members(record)
         source = max((s for s, _ in sources), key=lambda s: priority.get(s, 3))
         if counts.get(source, 0) >= per_source:
@@ -161,7 +163,8 @@ def deliver_digest(sources: dict, seen: dict, state: dict, config: dict,
     if not isinstance(briefs, dict):
         briefs, error = {}, 'InvalidSummaryResponse'
     for record in needing:
-        accept_brief(record, briefs.get(record['id']))
+        if not accept_brief(record, briefs.get(record['id'])):
+            record['summary_failures'] = record.get('summary_failures', 0) + 1
     ready = [r for r in selected if r.get('status') in ('ready', 'title_only')]
     batches = render_batches(ready)
     report = {'selected': len(selected), 'ready': len(ready), 'sent': 0,

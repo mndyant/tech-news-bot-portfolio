@@ -115,3 +115,20 @@ def test_partial_delivery_marks_only_confirmed_batch_seen():
     assert result['sent'] == 1 and result['errors'] == ['DeliveryNotConfirmed']
     assert seen == {'openai': ['0']} and len(state['pending']) == 2
     assert snapshots[-1][0] == {'openai': ['0']}
+
+
+def test_failed_summary_does_not_block_next_article_from_same_source():
+    seen, state = {}, {}
+    config = {'max_items': 1, 'max_per_source': 1}
+    deliver_digest({'openai': [record('bad')]}, seen, state, config,
+                   lambda _: {}, lambda _: True, lambda *args: None)
+    report = deliver_digest({'openai': [record('good')]}, seen, state, config,
+                            lambda rows: {r['id']: brief_for(rows)[r['id']]
+                                          for r in rows if r['id'] == 'openai:good'},
+                            lambda _: True, lambda *args: None)
+    assert report['sent'] == 1 and seen == {'openai': ['good']}
+    assert 'https://example.com/bad' in state['pending']
+    # The failed article is retained and can recover on a later run.
+    report = deliver_digest({}, seen, state, config, brief_for,
+                            lambda _: True, lambda *args: None)
+    assert report['sent'] == 1 and not state['pending']
